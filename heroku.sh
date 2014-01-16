@@ -43,7 +43,7 @@ httpd_archive_name=$httpd_dirname.tar.bz2
 # Download Apache if necessary.
 if [ ! -f $httpd_archive_name ]
 then
-    curl -LO http://archive.apache.org/dist/httpd/httpd-2.2.25.tar.gz
+    curl -LO http://archive.apache.org/dist/httpd/httpd-2.2.25.tar.bz2
 fi
 
 # Clean and extract Apache.
