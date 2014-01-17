@@ -16,18 +16,18 @@ find /app -mindepth 1 -print0 | xargs -0 rm -rf
 # Take care of vendoring ClamAV.
 clamav_version=0.98.1
 clamav_dirname=clamav-$clamav_version
-clam_archive_name=$clamav_dirname.tar.gz
+clamav_archive_name=$clamav_dirname.tar.gz
 
 # Download ClamAV if necessary.
-if [ ! -f 'clamav-0.98.1.tar.gz' ]
+if [ ! -f $clamav_archive_name ]
 then
-    curl -Lo 'clamav-0.98.1.tar.gz' http://downloads.sourceforge.net/clamav/clamav-0.98.1.tar.gz
+    curl -Lo $clamav_archive_name http://downloads.sourceforge.net/clamav/clamav-0.98.1.tar.gz
 fi
 
 
 # Clean and extract ClamAV.
 rm -rf $clamav_dirname
-tar xzvf 'clamav-0.98.1.tar.gz'
+tar xzvf $clamav_archive_name
 
 
 # Compile ClamAV
@@ -123,7 +123,7 @@ export PATH=/app/php/bin:$PATH
 /app/php/bin/pecl channel-update pecl.php.net
 
 # Use defaults for ZendOpcache build prompts.
-yes '' | /app/php/bin/pecl install ZendOpcache
+yes '' | /app/php/bin/pecl install ZendOpcache-beta
 
 # Use defaults for memcache build prompts.
 yes '' | /app/php/bin/pecl install memcache
@@ -134,24 +134,23 @@ yes '' | /app/php/bin/pecl install zip
 
 # Take care of vendoring PHPClamAV.
 phpclamav_version=0.15.7
-phpclamav_dirname=phpclamav-$phpclamav_version
-phpclam_archive_name=$phpclamav_dirname.tar.gz
+phpclamav_dirname=php-clamav-$phpclamav_version
+phpclamav_archive_name=$phpclamav_dirname.tar.gz
 
 # Download ClamAV if necessary.
-if [ ! -f 'phpclamav-0.15.7' ]
+if [ ! -f $phpclamav_archive_name ]
 then
-    curl -Lo 'phpclamav-0.15.7' http://sourceforge.net/projects/php-clamav/files/0.15/php-clamav_0.15.7.tar.gz/download
+    curl -Lo $phpclamav_archive_name http://sourceforge.net/projects/php-clamav/files/0.15/php-clamav_0.15.7.tar.gz/download
 fi
 
 
 # Clean and extract PHPClamAV.
 rm -rf $phpclamav_dirname
-tar xzvf 'phpclamav-0.15.7'
-
+tar xzvf $phpclamav_archive_name
 
 # Compile PHPClamAV
 pushd $phpclamav_dirname
-/app/php/bin/phpize
+phpize
 ./configure --with-clamav
 make -s
 popd
