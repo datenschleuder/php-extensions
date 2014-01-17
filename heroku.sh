@@ -114,11 +114,7 @@ mkdir -p /app/php/lib/php
 cp /usr/lib/libmysqlclient.so.16 /app/php/lib/php
 
 
-
-
-
-
-# 'apc' installation
+# php pecl modul installation
 #
 # $PATH manipulation Necessary for 'pecl install', which relies on
 # PHP binaries relative to $PATH.
@@ -142,15 +138,15 @@ phpclamav_dirname=phpclamav-$phpclamav_version
 phpclam_archive_name=$phpclamav_dirname.tar.gz
 
 # Download ClamAV if necessary.
-if [ ! -f $phpclamav_archive_name ]
+if [ ! -f 'phpclamav-0.15.7' ]
 then
-    curl -Lo $phpclamav_archive_name http://sourceforge.net/projects/php-clamav/files/0.15/php-clamav_0.15.7.tar.gz/download
+    curl -Lo 'phpclamav-0.15.7' http://sourceforge.net/projects/php-clamav/files/0.15/php-clamav_0.15.7.tar.gz/download
 fi
 
 
 # Clean and extract PHPClamAV.
 rm -rf $phpclamav_dirname
-tar jxf $phpclamav_archive_name
+tar xzvf 'phpclamav-0.15.7'
 
 
 # Compile PHPClamAV
@@ -161,10 +157,6 @@ make -s
 popd
 
 cp modules/clamav.so /app/php/lib/php/extensions/no-debug-non-zts-20090626
-
-
-
-
 
 
 # Sanitize default cgi-bin to rid oneself of Apache sample
