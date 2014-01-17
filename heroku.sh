@@ -12,6 +12,32 @@ heroku_rev='-2'
 # Clear /app directory
 find /app -mindepth 1 -print0 | xargs -0 rm -rf
 
+
+# Take care of vendoring ClamAV.
+clamav_version=0.98.1
+clamav_dirname=clamav-$clamav_version
+clam_archive_name=$clamav_dirname.tar.gz
+
+# Download ClamAV if necessary.
+if [ ! -f 'clamav-0.98.1.tar.gz' ]
+then
+    curl -Lo 'clamav-0.98.1.tar.gz' http://downloads.sourceforge.net/clamav/clamav-0.98.1.tar.gz
+fi
+
+
+# Clean and extract ClamAV.
+rm -rf $clamav_dirname
+tar xzvf 'clamav-0.98.1.tar.gz'
+
+
+# Compile ClamAV
+pushd $clamav_dirname
+./configure --prefix=/app/vendor/clamav --disable-clamav
+make -s
+make install -s
+popd
+
+
 # Take care of vendoring libmcrypt
 mcrypt_version=2.5.8
 mcrypt_dirname=libmcrypt-$mcrypt_version
@@ -88,29 +114,7 @@ mkdir -p /app/php/lib/php
 cp /usr/lib/libmysqlclient.so.16 /app/php/lib/php
 
 
-# Take care of vendoring ClamAV.
-clamav_version=0.98.1
-clamav_dirname=clamav-$clamav_version
-clam_archive_name=$clamav_dirname.tar.gz
 
-# Download ClamAV if necessary.
-if [ ! -f $clamav_archive_name ]
-then
-    curl -Lo $clamav_archive_name http://downloads.sourceforge.net/clamav/clamav-0.98.1.tar.gz
-fi
-
-
-# Clean and extract ClamAV.
-rm -rf $clamav_dirname
-tar jxf $clamav_archive_name
-
-
-# Compile ClamAV
-pushd $clamav_dirname
-./configure --prefix=/app/vendor/clamav
-make -s
-make install -s
-popd
 
 
 
