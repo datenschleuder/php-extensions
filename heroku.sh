@@ -77,7 +77,7 @@ pushd $php_dirname
 ./configure --prefix=/app/php --with-apxs2=/app/apache/bin/apxs     \
 --with-mysql --with-pdo-mysql --with-pgsql --with-pdo-pgsql         \
 --with-iconv --with-gd --with-curl=/usr/lib                         \
---with-config-file-path=/app/php --enable-soap=shared               \
+--with-config-file-path=/app/php --enable-soap=shared --enable-bcmath              \
 --with-openssl --with-mcrypt=/app/vendor/mcrypt --enable-sockets
 make -s
 make install -s
@@ -86,6 +86,33 @@ popd
 # Copy in MySQL client library.
 mkdir -p /app/php/lib/php
 cp /usr/lib/libmysqlclient.so.16 /app/php/lib/php
+
+
+# Take care of vendoring ClamAV.
+clamav_version=0.98.1
+clamav_dirname=clamav-$clamav_version
+clam_archive_name=$clamav_dirname.tar.gz
+
+# Download ClamAV if necessary.
+if [ ! -f $clamav_archive_name ]
+then
+    curl -Lo $clamav_archive_name http://downloads.sourceforge.net/clamav/clamav-0.98.1.tar.gz
+fi
+
+
+# Clean and extract ClamAV.
+rm -rf $clamav_dirname
+tar jxf $clamav_archive_name
+
+
+# Compile ClamAV
+pushd $clamav_dirname
+./configure --prefix=/app/vendor/clamav
+make -s
+make install -s
+popd
+
+
 
 # 'apc' installation
 #
@@ -101,6 +128,39 @@ yes '' | /app/php/bin/pecl install apc
 # Use defaults for memcache build prompts.
 yes '' | /app/php/bin/pecl install memcache
 
+
+
+# Take care of vendoring PHPClamAV.
+phpclamav_version=0.15.7
+phpclamav_dirname=phpclamav-$phpclamav_version
+phpclam_archive_name=$phpclamav_dirname.tar.gz
+
+# Download ClamAV if necessary.
+if [ ! -f $phpclamav_archive_name ]
+then
+    curl -Lo $phpclamav_archive_name http://sourceforge.net/projects/php-clamav/files/0.15/php-clamav_0.15.7.tar.gz/download
+fi
+
+
+# Clean and extract PHPClamAV.
+rm -rf $phpclamav_dirname
+tar jxf $phpclamav_archive_name
+
+
+# Compile PHPClamAV
+pushd $phpclamav_dirname
+/app/php/bin/phpize
+./configure --with-clamav
+make -s
+popd
+
+cp modules/clamav.so /app/php/lib/php/extensions/no-debug-non-zts-20090626
+
+
+
+
+
+
 # Sanitize default cgi-bin to rid oneself of Apache sample
 # programs.
 find /app/apache/cgi-bin/ -mindepth 1 -print0 | xargs -0 rm -r
@@ -113,4 +173,6 @@ echo $httpd_version > apache/VERSION
 tar -zcf apache-"$httpd_version""$heroku_rev".tar.gz apache
 echo $php_version > php/VERSION
 tar -zcf php-"$php_version""$heroku_rev".tar.gz php
+echo clamav_version > vendor/clamav/VERSION
+tar -zcf clamav-"$clamav_version""$heroku_rev".tar.gz vendor/clamav
 popd
