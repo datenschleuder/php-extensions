@@ -126,12 +126,14 @@ cp /usr/lib/libmysqlclient.so.16 /app/php/lib/php
 export PATH=/app/php/bin:$PATH
 /app/php/bin/pecl channel-update pecl.php.net
 
-# Use defaults for apc build prompts.
-yes '' | /app/php/bin/pecl install apc
+# Use defaults for ZendOpcache build prompts.
+yes '' | /app/php/bin/pecl install ZendOpcache
 
 # Use defaults for memcache build prompts.
 yes '' | /app/php/bin/pecl install memcache
 
+# Use defaults for zip build prompts.
+yes '' | /app/php/bin/pecl install zip
 
 
 # Take care of vendoring PHPClamAV.
